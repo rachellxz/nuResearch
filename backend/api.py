@@ -14,7 +14,7 @@ class News_Request(BaseModel):
     size: int
 
 class Category_Request(BaseModel):
-    name: str
+    category: str
 
 class User(BaseModel):
     name: str
@@ -47,7 +47,7 @@ async def connect(db = "nuresearch_db"):
     conn = psycopg2.connect(host="34.150.240.215", port = 5432, database= db, user="postgres", password="mcit2022")
     return conn
 
-@app.post('/login', tags = ['login_status'])
+@app.post('/login', tags = ['user'])
 async def create_cookies(user: User, response: Response):
     conn = await connect()
     response.set_cookie(key = "login_token", value = True, httponly = True)
@@ -61,52 +61,57 @@ async def create_cookies(user: User, response: Response):
         idd = len(query_results)
         cur.execute("""INSERT INTO users (id, name, email) VALUES (%(id)s, %(name)s, %(name)s);""", \
             {'id': str(idd), 'name': user.name } )
-        response.set(key = 'login_id', value = idd)
+        response.set_cookie(key = 'login_id', value = idd)
         cur.execute("SELECT * FROM users;")
         conn.commit()
     else:
         cur.execute("SELECT email, id FROM users WHERE email = %(name)s;", {"name" : user.name})
         query_results = cur.fetchall()
-        response.set(key = 'login_id', value = query_results[0][1])
+        print(query_results[0][1])
+        response.set_cookie(key = 'login_id', value = query_results[0][1])
 
     cur.close()
     conn.close()
     return "login_token set to true"
 
-@app.post('/category', tags = ['news'])
-async def add_user_category(category_request: Category_Request, login_token: Optional[bool] = Cookie(None), login_id: Optional[bool] = Cookie(None)):
-    if login_token:
-        conn = await connect("nr_db")
-        category = category_request.name
-
-
-        conn.close()
-    else:
-        return {"Message": "Not logged in"}
-
-@app.get('/category', tags = ['news'])
-async def add_user_category(category_request: Category_Request, login_token: Optional[bool] = Cookie(None)):
+@app.post('/category', tags = ['user'])
+async def add_user_category(category_request: Category_Request, login_token: Optional[bool] = Cookie(None), login_id: Optional[int] = Cookie(None)):
     if login_token:
         conn = await connect()
-        category = category_request.name
-
-        """TODO ADD SQL: Return  all categories associated with the user"""
-        # Example of how to do sql query
-        #cur = conn.cursor()
-        #cur.execute("""SELECT * FROM vendors""")
-        #query_results = cur.fetchall()
-        #print(query_results)    
-        #curr.close()
+        category = category_request.category
+        cur = conn.cursor()
+        cur.execute("""SELECT id, category FROM categories WHERE id = %(idd)s; """, {"idd": str(login_id)})
+        query_results = cur.fetchall()
+        
+        if (login_id, category_request.category, ) not in query_results:
+            cur.execute("""INSERT INTO categories (id, category) VALUES (%(id)s, %(category)s);""", \
+            {"id" : str(login_id), "category": category})
+        
+        conn.commit()        
+        cur.close()
         conn.close()
     else:
         return {"Message": "Not logged in"}
 
-@app.post('/logout', tags = ['login_status'])
+@app.get('/category', tags = ['user'])
+async def get_user_category(login_token: Optional[bool] = Cookie(None), login_id: Optional[int] = Cookie(None)):
+    if login_token:
+        conn = await connect()
+        cur = conn.cursor()
+        cur.execute("""SELECT id, category FROM categories WHERE id = %(idd)s; """, {"idd": str(login_id)})
+        query_results = cur.fetchall()
+        query_results = [i[1] for i in query_results]
+        conn.close()
+        return json.dumps(query_results)
+    else:
+        return {"Message": "Not logged in"}
+
+@app.post('/logout', tags = ['user'])
 async def create_cookies(response: Response):
     response.set_cookie(key = "login_token", value = False, httponly = True)
     return "login_token set to false"
 
-@app.get('/login', tags = ['login_status'])
+@app.get('/login', tags = ['user'])
 async def is_login(login_token: Optional[bool] = Cookie(None)):
     return login_token
 
