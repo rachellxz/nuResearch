@@ -43,8 +43,8 @@ async def send_news(news_request: News_Request) -> dict:
     parsed = json.loads(news)
     return parsed
 
-async def connect():
-    conn = psycopg2.connect(host="34.150.240.215", port = 5432, database="nuresearch_db", user="postgres", password="mcit2022")
+async def connect(db = "nuresearch_db"):
+    conn = psycopg2.connect(host="34.150.240.215", port = 5432, database= db, user="postgres", password="mcit2022")
     return conn
 
 @app.post('/login', tags = ['login_status'])
@@ -58,30 +58,28 @@ async def create_cookies(user: User, response: Response):
     query_results = cur.fetchall()
 
     if (user.name, ) not in query_results:
-        print(user.name)
+        idd = len(query_results)
         cur.execute("""INSERT INTO users (id, name, email) VALUES (%(id)s, %(name)s, %(name)s);""", \
-            {'id': str(len(query_results)), 'name': user.name } )
+            {'id': str(idd), 'name': user.name } )
+        response.set(key = 'login_id', value = idd)
         cur.execute("SELECT * FROM users;")
         conn.commit()
+    else:
+        cur.execute("SELECT email, id FROM users WHERE email = %(name)s;", {"name" : user.name})
+        query_results = cur.fetchall()
+        response.set(key = 'login_id', value = query_results[0][1])
 
     cur.close()
     conn.close()
     return "login_token set to true"
 
 @app.post('/category', tags = ['news'])
-async def add_user_category(category_request: Category_Request, login_token: Optional[bool] = Cookie(None)):
+async def add_user_category(category_request: Category_Request, login_token: Optional[bool] = Cookie(None), login_id: Optional[bool] = Cookie(None)):
     if login_token:
-        conn = await connect()
+        conn = await connect("nr_db")
         category = category_request.name
 
-        """TODO ADD SQL: Check if category associated with user. If not add category"""
-        # Example of how to do sql query
-        #cur = conn.cursor()
-        #cur.execute("""SELECT * FROM vendors""")
-        #query_results = cur.fetchall()
-        #print(query_results)    
-        #curr.close()
-        # return query_results
+
         conn.close()
     else:
         return {"Message": "Not logged in"}
