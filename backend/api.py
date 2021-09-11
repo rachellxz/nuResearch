@@ -1,3 +1,4 @@
+from os import name
 from typing import List, Optional
 from fastapi import FastAPI, Response, Cookie
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,6 +15,10 @@ class News_Request(BaseModel):
 
 class Category_Request(BaseModel):
     name: str
+
+class User(BaseModel):
+    name: str
+
 app = FastAPI()
 
 origins = [
@@ -39,21 +44,27 @@ async def send_news(news_request: News_Request) -> dict:
     return parsed
 
 async def connect():
-    conn = psycopg2.connect(host="34.150.240.215", port = 5432, database="nuresearch_db", user="postgres", password="mcit2022")s
+    conn = psycopg2.connect(host="34.150.240.215", port = 5432, database="nuresearch_db", user="postgres", password="mcit2022")
     return conn
 
 @app.post('/login', tags = ['login_status'])
-async def create_cookies(response: Response):
+async def create_cookies(user: User, response: Response):
     conn = await connect()
     response.set_cookie(key = "login_token", value = True, httponly = True)
     
-    """TODO ADD SQL: Check if user exists. If not create new user record"""
-    # Example of how to do sql query
-    #cur = conn.cursor()
-    #cur.execute("""SELECT * FROM vendors""")
-    #query_results = cur.fetchall()
-    #print(query_results)    
-    #curr.close()
+
+    cur = conn.cursor()
+    cur.execute("SELECT email FROM users;")
+    query_results = cur.fetchall()
+
+    if (user.name, ) not in query_results:
+        print(user.name)
+        cur.execute("""INSERT INTO users (id, name, email) VALUES (%(id)s, %(name)s, %(name)s);""", \
+            {'id': str(len(query_results)), 'name': user.name } )
+        cur.execute("SELECT * FROM users;")
+        conn.commit()
+
+    cur.close()
     conn.close()
     return "login_token set to true"
 
