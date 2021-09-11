@@ -28,7 +28,7 @@ def get_news(channel, top_n = 20):
     schema = ['title', 'summary', 'author', 'published', 'link']
     df = pd.DataFrame(list(feed.values())[1])[schema]
 
-    df['image'] = ['' for i in range(20)]
+    df['image'] = ['' for _ in range(20)]
 
     for index, row in df.iterrows():
         parts = row['summary'].split('" />')
