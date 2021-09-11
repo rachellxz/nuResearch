@@ -1,31 +1,31 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import {
-    Box,
-    Button,
-    Flex,
-    Input,
-    InputGroup,
-    Modal,
-    ModalBody,
-    ModalCloseButton,
-    ModalContent,
-    ModalFooter,
-    ModalHeader,
-    ModalOverlay,
-    Stack,
-    Text,
-    useDisclosure
+  Box,
+  Button,
+  Flex,
+  Input,
+  InputGroup,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Stack,
+  Text,
+  useDisclosure
 } from "@chakra-ui/core";
 
 const TodosContext = React.createContext({
-  todos: [], fetchTodos: () => {}
+  todos: [], fetchTodos: () => { }
 })
 
 function AddTodo() {
   const [item, setItem] = React.useState("")
-  const {todos, fetchTodos} = React.useContext(TodosContext)
+  const { todos, fetchTodos } = React.useContext(TodosContext)
 
-  const handleInput = event  => {
+  const handleInput = event => {
     setItem(event.target.value)
   }
 
@@ -57,10 +57,10 @@ function AddTodo() {
   )
 }
 
-function UpdateTodo({item, id}) {
-  const {isOpen, onOpen, onClose} = useDisclosure()
+function UpdateTodo({ item, id }) {
+  const { isOpen, onOpen, onClose } = useDisclosure()
   const [todo, setTodo] = useState(item)
-  const {fetchTodos} = React.useContext(TodosContext)
+  const { fetchTodos } = React.useContext(TodosContext)
 
   const updateTodo = async () => {
     await fetch(`http://localhost:8000/todo/${id}`, {
@@ -76,10 +76,10 @@ function UpdateTodo({item, id}) {
     <>
       <Button h="1.5rem" size="sm" onClick={onOpen}>Update Todo</Button>
       <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay/>
+        <ModalOverlay />
         <ModalContent>
           <ModalHeader>Update Todo</ModalHeader>
-          <ModalCloseButton/>
+          <ModalCloseButton />
           <ModalBody>
             <InputGroup size="md">
               <Input
@@ -102,8 +102,8 @@ function UpdateTodo({item, id}) {
   )
 }
 
-function DeleteTodo({id}) {
-  const {fetchTodos} = React.useContext(TodosContext)
+function DeleteTodo({ id }) {
+  const { fetchTodos } = React.useContext(TodosContext)
 
   const deleteTodo = async () => {
     await fetch(`http://localhost:8000/todo/${id}`, {
@@ -119,15 +119,15 @@ function DeleteTodo({id}) {
   )
 }
 
-function TodoHelper({item, id, fetchTodos}) {
+function TodoHelper({ item, id, fetchTodos }) {
   return (
     <Box p={1} shadow="sm">
       <Flex justify="space-between">
         <Text mt={4} as="div">
           {item}
           <Flex align="end">
-            <UpdateTodo item={item} id={id} fetchTodos={fetchTodos}/>
-            <DeleteTodo id={id} fetchTodos={fetchTodos}/>
+            <UpdateTodo item={item} id={id} fetchTodos={fetchTodos} />
+            <DeleteTodo id={id} fetchTodos={fetchTodos} />
           </Flex>
         </Text>
       </Flex>
@@ -146,14 +146,10 @@ export default function Todos() {
     fetchTodos()
   }, [])
   return (
-    <TodosContext.Provider value={{todos, fetchTodos}}>
+    <TodosContext.Provider value={{ todos, fetchTodos }}>
       <AddTodo />
       <Stack spacing={5}>
-        {
-          todos.map((todo) => (
-            <TodoHelper item={todo.item} id={todo.id} fetchTodos={fetchTodos} />
-          ))
-        }
+
       </Stack>
     </TodosContext.Provider>
   )

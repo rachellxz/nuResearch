@@ -9,49 +9,54 @@ from pydantic import BaseModel
 import json
 import psycopg2
 
+
 class News_Request(BaseModel):
     name: str
     size: int
 
+
 class Category_Request(BaseModel):
     category: str
+
 
 class User(BaseModel):
     name: str
 
+
 app = FastAPI()
 
-origins = [
-    'http://localhost:3000',
-    'localhost:3000'
-]
+origins = ['http://localhost:3000', 'localhost:3000']
 
-
-app.add_middleware(
-        CORSMiddleware,
-        allow_origins=origins,
-        allow_credentials=True,
-        allow_methods=['*'],
-        allow_headers=['*']
-)
+app.add_middleware(CORSMiddleware,
+                   allow_origins=origins,
+                   allow_credentials=True,
+                   allow_methods=['*'],
+                   allow_headers=['*'])
 
 app.mount("/assets", StaticFiles(directory='assets'), name="static")
 
-@app.post('/news', tags = ['news'])
+
+@app.post('/news', tags=['news'])
 async def send_news(news_request: News_Request) -> dict:
-    news = get_news(news_request.name, news_request.size).to_json(orient='records')
+    news = get_news(news_request.name,
+                    news_request.size).to_json(orient='records')
     parsed = json.loads(news)
     return parsed
 
-async def connect(db = "nuresearch_db"):
-    conn = psycopg2.connect(host="34.150.240.215", port = 5432, database= db, user="postgres", password="mcit2022")
+
+async def connect(db="nuresearch_db"):
+    conn = psycopg2.connect(host="34.150.240.215",
+                            port=5432,
+                            database=db,
+                            user="postgres",
+                            password="mcit2022")
     return conn
 
-@app.post('/login', tags = ['user'])
+
+@app.post('/login', tags=['user'])
 async def create_cookies(user: User, response: Response):
     conn = await connect()
-    response.set_cookie(key = "login_token", value = True, httponly = True)
-    
+    response.set_cookie(key="login_token", value=True, httponly=True)
 
     cur = conn.cursor()
     cur.execute("SELECT email FROM users;")
@@ -61,44 +66,57 @@ async def create_cookies(user: User, response: Response):
         idd = len(query_results)
         cur.execute("""INSERT INTO users (id, name, email) VALUES (%(id)s, %(name)s, %(name)s);""", \
             {'id': str(idd), 'name': user.name } )
-        response.set_cookie(key = 'login_id', value = idd)
+        response.set_cookie(key='login_id', value=idd)
         cur.execute("SELECT * FROM users;")
         conn.commit()
     else:
-        cur.execute("SELECT email, id FROM users WHERE email = %(name)s;", {"name" : user.name})
+        cur.execute("SELECT email, id FROM users WHERE email = %(name)s;",
+                    {"name": user.name})
         query_results = cur.fetchall()
         print(query_results[0][1])
-        response.set_cookie(key = 'login_id', value = query_results[0][1])
+        response.set_cookie(key='login_id', value=query_results[0][1])
 
     cur.close()
     conn.close()
     return "login_token set to true"
 
-@app.post('/category', tags = ['user'])
-async def add_user_category(category_request: Category_Request, login_token: Optional[bool] = Cookie(None), login_id: Optional[int] = Cookie(None)):
+
+@app.post('/category', tags=['user'])
+async def add_user_category(category_request: Category_Request,
+                            login_token: Optional[bool] = Cookie(None),
+                            login_id: Optional[int] = Cookie(None)):
     if login_token:
         conn = await connect()
         category = category_request.category
         cur = conn.cursor()
-        cur.execute("""SELECT id, category FROM categories WHERE id = %(idd)s; """, {"idd": str(login_id)})
+        cur.execute(
+            """SELECT id, category FROM categories WHERE id = %(idd)s; """,
+            {"idd": str(login_id)})
         query_results = cur.fetchall()
-        
-        if (login_id, category_request.category, ) not in query_results:
+
+        if (
+                login_id,
+                category_request.category,
+        ) not in query_results:
             cur.execute("""INSERT INTO categories (id, category) VALUES (%(id)s, %(category)s);""", \
             {"id" : str(login_id), "category": category})
-        
-        conn.commit()        
+
+        conn.commit()
         cur.close()
         conn.close()
     else:
         return {"Message": "Not logged in"}
 
-@app.get('/category', tags = ['user'])
-async def get_user_category(login_token: Optional[bool] = Cookie(None), login_id: Optional[int] = Cookie(None)):
+
+@app.get('/category', tags=['user'])
+async def get_user_category(login_token: Optional[bool] = Cookie(None),
+                            login_id: Optional[int] = Cookie(None)):
     if login_token:
         conn = await connect()
         cur = conn.cursor()
-        cur.execute("""SELECT id, category FROM categories WHERE id = %(idd)s; """, {"idd": str(login_id)})
+        cur.execute(
+            """SELECT id, category FROM categories WHERE id = %(idd)s; """,
+            {"idd": str(login_id)})
         query_results = cur.fetchall()
         query_results = [i[1] for i in query_results]
         conn.close()
@@ -106,27 +124,33 @@ async def get_user_category(login_token: Optional[bool] = Cookie(None), login_id
     else:
         return {"Message": "Not logged in"}
 
-@app.post('/logout', tags = ['user'])
+
+@app.post('/logout', tags=['user'])
 async def create_cookies(response: Response):
-    response.set_cookie(key = "login_token", value = False, httponly = True)
+    response.set_cookie(key="login_token", value=False, httponly=True)
     return "login_token set to false"
 
-@app.get('/login', tags = ['user'])
+
+@app.get('/login', tags=['user'])
 async def is_login(login_token: Optional[bool] = Cookie(None)):
+    if login_token is None:
+        return False
     return login_token
 
-@app.get('/', tags = ['root'])
+
+@app.get('/', tags=['root'])
 async def send_hello() -> dict:
     return {'message': 'hello'}
-    
-@app.get('/catalog', tags = ['news'])
+
+
+@app.get('/catalog', tags=['news'])
 async def send_catalog() -> dict:
-    catalog = get_catalog().to_json(orient='records')     
+    catalog = get_catalog().to_json(orient='records')
     parsed = json.loads(catalog)
     return parsed
 
-@app.get('/genres', tags = ['news', 'genres'])
-async def send_genres() -> dict:
-    catalog = get_genres()     
-    return json.dumps(catalog)
 
+@app.get('/genres', tags=['news', 'genres'])
+async def send_genres() -> dict:
+    catalog = get_genres()
+    return catalog
