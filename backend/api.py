@@ -7,26 +7,13 @@ from aiofiles import *
 from pydantic import BaseModel
 import json
 import psycopg2
-"""
-ssl_files = {'ssl_ca': 'ssl/server-ca.pem',
-    'ssl_cert': 'ssl/client-cert.pem',
-    'ssl_key': 'ssl/client-key.pem'}
-
-config = {
-    'user': 'postgres',
-    'password': 'mcit2022',
-    'dbname': 'nuresearch_db',
-    'host': '34.150.240.215',
-    'sslmode': 'require'
-}
-
-conn = psycopg2.connect(**config)
-"""
 
 class News_Request(BaseModel):
     name: str
     size: int
 
+class Category_Request(BaseModel):
+    name: str
 app = FastAPI()
 
 origins = [
@@ -51,13 +38,62 @@ async def send_news(news_request: News_Request) -> dict:
     parsed = json.loads(news)
     return parsed
 
+async def connect():
+    conn = psycopg2.connect(host="34.150.240.215", port = 5432, database="nuresearch_db", user="postgres", password="mcit2022")s
+    return conn
+
 @app.post('/login', tags = ['login_status'])
-def create_cookies(response: Response):
+async def create_cookies(response: Response):
+    conn = await connect()
     response.set_cookie(key = "login_token", value = True, httponly = True)
+    
+    """TODO ADD SQL: Check if user exists. If not create new user record"""
+    # Example of how to do sql query
+    #cur = conn.cursor()
+    #cur.execute("""SELECT * FROM vendors""")
+    #query_results = cur.fetchall()
+    #print(query_results)    
+    #curr.close()
+    conn.close()
     return "login_token set to true"
 
+@app.post('/category', tags = ['news'])
+async def add_user_category(category_request: Category_Request, login_token: Optional[bool] = Cookie(None)):
+    if login_token:
+        conn = await connect()
+        category = category_request.name
+
+        """TODO ADD SQL: Check if category associated with user. If not add category"""
+        # Example of how to do sql query
+        #cur = conn.cursor()
+        #cur.execute("""SELECT * FROM vendors""")
+        #query_results = cur.fetchall()
+        #print(query_results)    
+        #curr.close()
+        # return query_results
+        conn.close()
+    else:
+        return {"Message": "Not logged in"}
+
+@app.get('/category', tags = ['news'])
+async def add_user_category(category_request: Category_Request, login_token: Optional[bool] = Cookie(None)):
+    if login_token:
+        conn = await connect()
+        category = category_request.name
+
+        """TODO ADD SQL: Return  all categories associated with the user"""
+        # Example of how to do sql query
+        #cur = conn.cursor()
+        #cur.execute("""SELECT * FROM vendors""")
+        #query_results = cur.fetchall()
+        #print(query_results)    
+        #curr.close()
+        conn.close()
+    else:
+        return {"Message": "Not logged in"}
+
 @app.post('/logout', tags = ['login_status'])
-def create_cookies(response: Response):
+async def create_cookies(response: Response):
     response.set_cookie(key = "login_token", value = False, httponly = True)
     return "login_token set to false"
 
