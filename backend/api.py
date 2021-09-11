@@ -1,7 +1,8 @@
+from typing import List
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.staticfiles import StaticFiles
-from .rss import *
+from rss import *
 from aiofiles import *
 from pydantic import BaseModel
 import json
@@ -25,7 +26,7 @@ app.add_middleware(
         allow_headers=['*']
 )
 
-app.mount("/assets", StaticFiles(directory=Path(BASE_DIR, '/assets')), name="static")
+app.mount("/assets", StaticFiles(directory='assets'), name="static")
 
 class News_Request(BaseModel):
     name: str
@@ -42,10 +43,9 @@ async def send_catalog() -> dict:
     return parsed
 
 @app.get('/genres', tags = ['news', 'genres'])
-async def send_genres():
-    catalog = get_genres().to_json(orient='records')     
-    parsed = json.loads(catalog)
-    return parsed
+async def send_genres() -> dict:
+    catalog = get_genres()     
+    return json.dumps(catalog)
 
 @app.post('/news', tags = ['news'])
 async def send_news(news_request: News_Request) -> dict:
