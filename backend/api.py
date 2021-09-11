@@ -6,14 +6,28 @@ from rss import *
 from aiofiles import *
 from pydantic import BaseModel
 import json
-from pathlib import Path
+import psycopg2
+"""
+ssl_files = {'ssl_ca': 'ssl/server-ca.pem',
+    'ssl_cert': 'ssl/client-cert.pem',
+    'ssl_key': 'ssl/client-key.pem'}
+
+config = {
+    'user': 'postgres',
+    'password': 'mcit2022',
+    'dbname': 'nuresearch_db',
+    'host': '34.150.240.215',
+    'sslmode': 'require'
+}
+
+conn = psycopg2.connect(**config)
+"""
 
 class News_Request(BaseModel):
     name: str
     size: int
 
 app = FastAPI()
-BASE_DIR = Path(__file__).resolve().parent
 
 origins = [
     'http://localhost:3000',
