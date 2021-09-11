@@ -1,24 +1,19 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
-
-todos = [
-    {
-        "id": "1",
-        "item": "Read a book."
-    },
-    {
-        "id": "2",
-        "item": "Cycle around town."
-    }
-]
+from starlette.staticfiles import StaticFiles
+from .rss import *
+from aiofiles import *
+from pydantic import BaseModel
+import json
+from pathlib import Path
 
 
 app = FastAPI()
+BASE_DIR = Path(__file__).resolve().parent
 
 origins = [
-    "http://localhost:3000",
-    "localhost:3000"
+    'http://localhost:3000',
+    'localhost:3000'
 ]
 
 
@@ -26,52 +21,34 @@ app.add_middleware(
         CORSMiddleware,
         allow_origins=origins,
         allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"]
+        allow_methods=['*'],
+        allow_headers=['*']
 )
 
+app.mount("/assets", StaticFiles(directory=Path(BASE_DIR, '/assets')), name="static")
 
-@app.get("/", tags=["root"])
-async def read_root() -> dict:
-    return {"message": "Welcome to your todo list."}
+class News_Request(BaseModel):
+    name: str
+    size: int
 
+@app.get('/', tags = ['root'])
+async def send_hello() -> dict:
+    return {'message': 'hello'}
+    
+@app.get('/catalog', tags = ['news'])
+async def send_catalog() -> dict:
+    catalog = get_catalog().to_json(orient='records')     
+    parsed = json.loads(catalog)
+    return parsed
 
-@app.get("/todo", tags=["todos"])
-async def get_todos() -> dict:
-    return { "data": todos }
+@app.get('/genres', tags = ['news', 'genres'])
+async def send_genres():
+    catalog = get_genres().to_json(orient='records')     
+    parsed = json.loads(catalog)
+    return parsed
 
-
-@app.post("/todo", tags=["todos"])
-async def add_todo(todo: dict) -> dict:
-    todos.append(todo)
-    return {
-        "data": { "Todo added." }
-    }
-
-
-@app.put("/todo/{id}", tags=["todos"])
-async def update_todo(id: int, body: dict) -> dict:
-    for todo in todos:
-        if int(todo["id"]) == id:
-            todo["item"] = body["item"]
-            return {
-                "data": f"Todo with id {id} has been updated."
-            }
-
-    return {
-        "data": f"Todo with id {id} not found."
-    }
-
-
-@app.delete("/todo/{id}", tags=["todos"])
-async def delete_todo(id: int) -> dict:
-    for todo in todos:
-        if int(todo["id"]) == id:
-            todos.remove(todo)
-            return {
-                "data": f"Todo with id {id} has been removed."
-            }
-
-    return {
-        "data": f"Todo with id {id} not found."
-    }
+@app.post('/news', tags = ['news'])
+async def send_news(news_request: News_Request) -> dict:
+    news = get_news(news_request.name, news_request.size).to_json(orient='records')
+    parsed = json.loads(news)
+    return parsed
