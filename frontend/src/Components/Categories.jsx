@@ -18,27 +18,18 @@ const Categories = () => {
     }
 
     const handleCatClick = (cat) => {
-        setIsClick(!isClicked)
+        setIsClick(false)
         setCategory(cat)
     }
 
-    const dropdownItem = (cat) => {
-        return (
-            <>
-                <a href="#" onClick={(e) => { handleCatClick(cat) }}>
-                    {cat}
-                </a>
-            </>
-        )
-    }
 
-    const handleSubmit = async (cat) => {
+
+    const handleSubmit = async () => {
+        setIsClick(false)
         await axios.post('/category', {
-            "category": cat
+            "category": category
         })
-            .then(function (response) {
-                console.log(response)
-            })
+        console.log(category)
     }
 
     console.log(categories)
@@ -46,8 +37,8 @@ const Categories = () => {
 
         <>
             {isClicked ?
-                <div className="dropdown is-active" onClick={handleClick}>
-                    <div className="dropdown-trigger">
+                <div className="dropdown is-active">
+                    <div className="dropdown-trigger" onClick={handleClick}>
                         <button className="button" aria-haspopup="true" aria-controls="dropdown-menu">
                             <span>{category}</span>
                             <span className="icon is-small">
@@ -74,8 +65,8 @@ const Categories = () => {
 
                 </div> :
 
-                <div className="dropdown" onClick={handleClick}>
-                    <div className="dropdown-trigger">
+                <div className="dropdown">
+                    <div className="dropdown-trigger" onClick={handleClick}>
                         <button className="button" aria-haspopup="true" aria-controls="dropdown-menu">
                             <span> {category} </span>
                             <span className="icon is-small">
