@@ -54,9 +54,9 @@ const Feed = () => {
               </figure>
             </div>
             <div class="content">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-              Phasellus nec iaculis mauris. <a>@bulmaio</a>.
-              <a href="#">#css</a> <a href="#">#responsive</a>
+              {elem.summary}              
+              <br/>
+              <p> <a href = {elem.link}> Click me </a></p>
               <br/>
             </div>
           </div> 
@@ -86,9 +86,9 @@ const Feed = () => {
               </figure>
             </div>
             <div class="content">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-              Phasellus nec iaculis mauris. <a>@bulmaio</a>.
-              <a href="#">#css</a> <a href="#">#responsive</a>
+              {elem.summary}
+              <br/>
+              <p> <a href = {elem.link}> Click me </a></p>
               <br/>
             </div>
           </div>
