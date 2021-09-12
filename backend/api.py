@@ -38,10 +38,13 @@ app.mount("/assets", StaticFiles(directory='assets'), name="static")
 
 @app.post('/news', tags=['news'])
 async def send_news(news_request: News_Request) -> dict:
-    news = get_news(news_request.name,
-                    news_request.size).to_json(orient='records')
-    parsed = json.loads(news)
-    return parsed
+    try:
+        news = get_news(news_request.name,
+                        news_request.size).to_json(orient='records')
+        parsed = json.loads(news)
+        return parsed
+    except:
+        return []
 
 @app.post('/example', tags = ['homer'])
 async def send_email() -> dict:

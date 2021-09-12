@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Categories from "./Categories";
 import Login from "./Login";
+import Feed from "./Feed";
 import "./static/app.css";
 import axios from "axios";
 
@@ -48,7 +49,7 @@ const Header = () => {
             {tab === 'Category' ?
               <div> <Categories /> </div>
               :
-              <div></div>
+              <div> <Feed /> </div>
             }
           </>
         }
