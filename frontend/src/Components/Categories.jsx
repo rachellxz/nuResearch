@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./static/app.css";
 
-const Categories = () => {
+const Categories = (props) => {
     const [categories, setCategories] = useState([]);
     const [isClicked, setIsClick] = useState(false)
     const [category, setCategory] = useState('Select A Category')
@@ -11,6 +11,7 @@ const Categories = () => {
         // Update the document title using the browser API
         axios.get('/channels')
             .then((res) => { setCategories(res.data) });
+
     }, [])
 
     const handleClick = () => {
@@ -22,14 +23,14 @@ const Categories = () => {
         setCategory(cat)
     }
 
-
-
     const handleSubmit = async () => {
         setIsClick(false)
         await axios.post('/category', {
             "category": category
         })
+        alert(`You have submitted a ${category}`)
         console.log(category)
+        
     }
 
     return (

@@ -56,7 +56,7 @@ const Header = () => {
           <>
             {tabs()}
             {tab === 'Category' ?
-              <div> <Categories /> </div>
+              <div> <Categories handleFeedClick = {handleFeedClick}/> </div>
               :
               <div> <Feed /> </div>
             }

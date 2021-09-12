@@ -39,7 +39,7 @@ const Feed = () => {
       {
         news.map((elem, idx) => {
           console.log(idx)
-          if (elem.image !== '' && idx % 2 === 0) {
+          if (elem.image !== '' && elem.image !== null && idx % 2 === 0) {
             return(
             <>
             <div class="card">
@@ -50,7 +50,7 @@ const Feed = () => {
             </header>
             <div class="card-image">
               <figure class="image is-4by3">
-                <img src={elem.image} alt="Placeholder image"/>
+                <img src={elem.image} onerror="this.src=nuResearch.png" alt=""/>
               </figure>
             </div>
             <div class="content">
@@ -71,7 +71,7 @@ const Feed = () => {
       {
         news.map((elem, idx) => {
           console.log(idx)
-          if (elem.image !== '' && idx % 2 === 1) {
+          if (elem.image !== '' && elem.image !== null && idx % 2 === 1) {
             return(
             <>
             <div class="card">
@@ -98,7 +98,7 @@ const Feed = () => {
         }})
       }
 
-      </div>
+    </div>
       <div className = "column"/>
     </div>
 

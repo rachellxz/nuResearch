@@ -46,18 +46,14 @@ async def send_news(news_request: News_Request) -> dict:
     except:
         return []
 
-@app.post('/example', tags = ['homer'])
-async def send_email() -> dict:
-
-    return {"message": "it works!"}
-
-
 async def connect(db="nuresearch_db"):
+    f = open('.config', 'r')
+    config = json.loads(f.read())
     conn = psycopg2.connect(host="34.150.240.215",
                             port=5432,
                             database=db,
                             user="postgres",
-                            password="mcit2022")
+                            password=config["pass"])
     return conn
 
 
