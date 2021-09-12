@@ -43,6 +43,11 @@ async def send_news(news_request: News_Request) -> dict:
     parsed = json.loads(news)
     return parsed
 
+@app.post('/example', tags = ['homer'])
+async def send_email() -> dict:
+
+    return {"message": "it works!"}
+
 
 async def connect(db="nuresearch_db"):
     conn = psycopg2.connect(host="34.150.240.215",
