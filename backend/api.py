@@ -125,7 +125,7 @@ async def get_user_category(login_token: Optional[bool] = Cookie(None),
         query_results = cur.fetchall()
         query_results = [i[1] for i in query_results]
         conn.close()
-        return json.dumps(query_results)
+        return query_results
     else:
         return {"Message": "Not logged in"}
 

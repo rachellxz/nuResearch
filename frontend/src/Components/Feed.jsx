@@ -5,12 +5,15 @@ import "./static/app.css";
 import axios from "axios";
 
 const Feed = () => {
-  useEffect(() => {
-    // Update the document title using the browser API
-    axios.get('/login')
-      .then((res) => { setLoggedIn(res.data) })
+  const [channels, setChannels] = useState([])
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      await axios.get('/category')
+      .then((res) => { setChannels(res.data) })    }, 1000);
+    return () => clearInterval(interval);
   }, []);
+
 
 
   return (
