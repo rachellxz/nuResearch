@@ -124,6 +124,9 @@ async def get_user_category(login_token: Optional[bool] = Cookie(None),
     else:
         return {"Message": "Not logged in"}
 
+@app.get('/channels', tags=['news'])
+async def send_channels():
+    return get_channels()
 
 @app.post('/logout', tags=['user'])
 async def create_cookies(response: Response):

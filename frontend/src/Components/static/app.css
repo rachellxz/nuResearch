@@ -1,3 +1,8 @@
+.dropdown-content {
+    max-height: 13em;
+    overflow: auto;
+  }
+
 /* @import url("https://use.typekit.net/lca5fxz.css");
 * {
     background-color: rgb(255, 252, 240);
@@ -8,7 +13,10 @@
 h1 {
     font-size: 2.5em;
 }
-
+.dropdown-content {
+  max-height: 13em;
+  overflow: auto;
+}
 .main {
     display: flex;
     align-items: center;

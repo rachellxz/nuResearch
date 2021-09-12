@@ -9,7 +9,7 @@ const Categories = () => {
 
     useEffect(() => {
         // Update the document title using the browser API
-        axios.get('/genres')
+        axios.get('/channels')
             .then((res) => { setCategories(res.data) });
     }, [])
 
@@ -32,7 +32,6 @@ const Categories = () => {
         console.log(category)
     }
 
-    console.log(categories)
     return (
 
         <>
