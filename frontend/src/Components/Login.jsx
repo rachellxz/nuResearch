@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from "react";
-import Categories from "./Categories";
 import axios from "axios";
 
 const Login = (props) => {
   const [emailInput, setEmailInput] = useState("");
-
 
   const updateEmail = e => {
     setEmailInput(e.target.value);
@@ -23,15 +21,18 @@ const Login = (props) => {
   }
 
   return (
-    <>
-      <div>
-        <h2> What's your email? </h2>
+    <div className="main">
+      <img src="nuResearch.png" width="300" className="logo-landing" />
+      <div className="field">
+        <label class="label">What's your email?</label>
+        <div class="control">
           <form onSubmit={saveEmail}>
-            <input type="email" id="email" name="email" onChange={updateEmail} required />
-            <input className = "button" type="submit" id="submit-btn" value="Next" />
+            <input className="input" type="email" id="email" name="email" onChange={updateEmail} required />
+            <button className="button" type="submit" id="submit-btn">Next</button>
           </form>
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 

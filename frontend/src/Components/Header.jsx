@@ -24,21 +24,30 @@ const Header = () => {
   }
 
   const tabs = () => {
-    return(
-      <div class="tabs is-large is-centered">
-        <ul>
-          <li><a onClick = {handleCatClick}>Category</a></li>
-          <li><a onClick = {handleFeedClick}>Feed</a></li>
-        </ul>
-      </div>
+    return (
+      <>
+        <nav class="navbar" role="navigation" aria-label="main navigation">
+          <div class="navbar-brand">
+            <a class="navbar-item" href="#">
+              <img src="nuResearch.png" width="200" height="50" />
+            </a>
+          </div>
+        </nav>
+
+        <div className="tabs is-large is-centered">
+          <ul>
+            <li><a onClick={handleCatClick}>Category</a></li>
+            <li><a onClick={handleFeedClick}>Feed</a></li>
+          </ul>
+        </div>
+      </>
+
     )
   }
   return (
     <>
+      <div className="main-content">
 
-      <div className="main">
-        <h1> nuResearch </h1>
-          
         {loggedIn === false ?
           <Login setLoggedIn={setLoggedIn} />
           :

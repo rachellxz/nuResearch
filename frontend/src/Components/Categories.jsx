@@ -73,7 +73,6 @@ const Categories = () => {
                             </span>
                         </button>
                     </div>
-
                     <button onClick={handleSubmit} className="button"> Submit </button>
 
                 </div>
