@@ -1,3 +1,5 @@
+## PennHacks Fall 2021
+See https://devpost.com/software/nuresearch
 ## Inspiration
 Our inspiration is based on hearing from industry colleagues that they often need to do research to keep up with the new research occurring in their domain. Research materials are often spread across multiple different sites and require users to actively search through information. 
 
